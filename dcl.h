@@ -36,8 +36,10 @@ typedef ap_uint<myFP_MAX_MANT_BIT + 1> myFP_mant; // account for the implicit 1 
 
 
 float randomFloatRange(float min1, float max1, float min2, float max2);
-void float2myFP(float *f, myFP *h, int EB, int MB, bool *overflow);
-float myFP2float(const myFP h, int EB, int MB);
+void float2myFP_8(float *f, myFP *h, int EB, int MB, bool *overflow);
+float myFP2float_8(const myFP h, int EB, int MB);
+float myFP2float_8(data_8 h, int EB, int MB);
+void float2myFP_8(float *f, data_8 *h, int EB, int MB, bool *overflow);
 
 void MatMul_E5M2( data_8 a[DIM][DIM], data_8 b[DIM][DIM], data_8 c[DIM][DIM]);
 void MatMul_E4M3( data_8 a[DIM][DIM], data_8 b[DIM][DIM], data_8 c[DIM][DIM]);
