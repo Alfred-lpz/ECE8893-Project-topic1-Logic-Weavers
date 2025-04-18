@@ -8,7 +8,7 @@ IFLAG += -g
 
 CFLAG += -fPIC -O0
 CFLAG += -lm
-CFLAG += -std=c++11 -Wno-unused-result 
+CFLAG += -std=c++14 -Wno-unused-result 
 
 all:
 	#g++ matrix_generation.cpp -o result $(CFLAG) $(IFLAG)

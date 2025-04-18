@@ -168,25 +168,81 @@ void convertFloatToAPFix_8(const char* inputFile, const char* outputFile) {
     writeMatrix(outputFile, matrixAPFix);
 }
 
+void convertFloatMatrixToMyFP_8(float matrixFloat[DIM][DIM], const char* outputFile, int EB, int MB) {
+    data_8 matrixMyFP[DIM][DIM];
+
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j) {
+            bool overflow = false;
+            float2myFP_8(&matrixFloat[i][j], &matrixMyFP[i][j], EB, MB, &overflow);
+        }
+
+    writeMatrix(outputFile, matrixMyFP);
+}
+
+void convertFloatMatrixToMyFP_16(float matrixFloat[DIM][DIM], const char* outputFile, int EB, int MB) {
+    data_16 matrixMyFP[DIM][DIM];
+
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j) {
+            bool overflow = false;
+            float2myFP_16(&matrixFloat[i][j], &matrixMyFP[i][j], EB, MB, &overflow);
+        }
+
+    writeMatrix(outputFile, matrixMyFP);
+}
+
+
+void convertFloatMatrixToAPFix_8(float matrixFloat[DIM][DIM], const char* outputFile) {
+    data_8 matrixFix[DIM][DIM];  
+
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j) {
+            ap_fixed<8, 4, AP_TRN, AP_SAT> fx = matrixFloat[i][j];
+            matrixFix[i][j] = fx.range(7, 0); 
+        }
+
+    writeMatrix(outputFile, matrixFix);
+}
+
+void convertFloatMatrixToAPFix_16(float matrixFloat[DIM][DIM], const char* outputFile) {
+    data_16 matrixFix[DIM][DIM];  
+
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j) {
+            ap_fixed<16, 5, AP_TRN, AP_SAT> fx = matrixFloat[i][j];
+            matrixFix[i][j] = fx.range(15, 0); 
+        }
+
+    writeMatrix(outputFile, matrixFix);
+}
+
 
 int main() {
-    const char* matrixA_float_file = "matrix_a_float.bin";
-    const char* matrixB_float_file = "matrix_b_float.bin";
+    const char* matrixA_float_file = "matrix_a_float_1.bin";
+    const char* matrixB_float_file = "matrix_b_float_1.bin";
+    const char* matrixC_float_file = "matrix_c_float_1.bin";
 
-    const char* matrixA_E4M3_file = "matrix_a_E4M3.bin";
-    const char* matrixB_E4M3_file = "matrix_b_E4M3.bin";
+    const char* matrixA_E4M3_file = "matrix_a_E4M3_1.bin";
+    const char* matrixB_E4M3_file = "matrix_b_E4M3_1.bin";
+    const char* matrixC_E4M3_file = "matrix_c_E4M3_1.bin";
 
-    const char* matrixA_E5M2_file = "matrix_a_E5M2.bin";
-    const char* matrixB_E5M2_file = "matrix_b_E5M2.bin";
+    const char* matrixA_E5M2_file = "matrix_a_E5M2_1.bin";
+    const char* matrixB_E5M2_file = "matrix_b_E5M2_1.bin";
+    const char* matrixC_E5M2_file = "matrix_c_E5M2_1.bin";
 
-    const char* matrixA_E5M10_file = "matrix_a_E5M10.bin";
-    const char* matrixB_E5M10_file = "matrix_b_E5M10.bin";
 
-    const char* matrixA_AP16_5_file = "matrix_a_AP16_5.bin";
-    const char* matrixB_AP16_5_file = "matrix_b_AP16_5.bin";
+    const char* matrixA_E5M10_file = "matrix_a_E5M10_1.bin";
+    const char* matrixB_E5M10_file = "matrix_b_E5M10_1.bin";
+    const char* matrixC_E5M10_file = "matrix_c_E5M10_1.bin";
 
-    const char* matrixA_AP8_4_file = "matrix_a_AP8_4.bin";
-    const char* matrixB_AP8_4_file = "matrix_b_AP8_4.bin";
+    const char* matrixA_AP16_5_file = "matrix_a_AP16_5_1.bin";
+    const char* matrixB_AP16_5_file = "matrix_b_AP16_5_1.bin";
+    const char* matrixC_AP16_5_file = "matrix_c_AP16_5_1.bin";
+
+    const char* matrixA_AP8_4_file = "matrix_a_AP8_4_1.bin";
+    const char* matrixB_AP8_4_file = "matrix_b_AP8_4_1.bin";
+    const char* matrixC_AP8_4_file = "matrix_c_AP8_4_1.bin";
 
     // Generate floating-point matrices
     generateFloatMatrix(matrixA_float_file);
@@ -209,15 +265,7 @@ int main() {
 
     std::cout << "All computations complete. Results saved to respective files." << std::endl;
 
-
-    // test on multiplication between matrix_a_E4M3 and matrix_b_E4M3
-    data_8 matrixA_E4M3[DIM][DIM], matrixB_E4M3[DIM][DIM];
     float matrixA_float[DIM][DIM], matrixB_float[DIM][DIM], matrixC_float[DIM][DIM] = {0};
-    float matrixC_E4M3_float[DIM][DIM] = {0};
-
-    // Read matrices
-    readMatrix(matrixA_E4M3_file, matrixA_E4M3);
-    readMatrix(matrixB_E4M3_file, matrixB_E4M3);
     readMatrix(matrixA_float_file, matrixA_float);
     readMatrix(matrixB_float_file, matrixB_float);
 
@@ -226,6 +274,16 @@ int main() {
         for (int j = 0; j < DIM; ++j)
             for (int k = 0; k < DIM; ++k)
                 matrixC_float[i][j] += matrixA_float[i][k] * matrixB_float[k][j];
+    writeMatrix(matrixC_float_file, matrixC_float);
+
+
+    // test on multiplication between matrix_a_E4M3 and matrix_b_E4M3
+    data_8 matrixA_E4M3[DIM][DIM], matrixB_E4M3[DIM][DIM];
+    float matrixC_E4M3_float[DIM][DIM] = {0};
+
+    // Read matrices
+    readMatrix(matrixA_E4M3_file, matrixA_E4M3);
+    readMatrix(matrixB_E4M3_file, matrixB_E4M3);
 
     // Perform E4M3 matrix multiplication
     for (int i = 0; i < DIM; ++i)
@@ -241,13 +299,54 @@ int main() {
     for (int i = 0; i < DIM; ++i)
         for (int j = 0; j < DIM; ++j) {
             mse += std::pow(matrixC_float[i][j] - matrixC_E4M3_float[i][j], 2);
-            //printf("float: %.8f, myFP: %.8f\n", matrixC_float[i][j], matrixC_E4M3_float[i][j]);
+            printf("float: %.8f, myFP: %.8f\n", matrixC_float[i][j], matrixC_E4M3_float[i][j]);
         }
 
     mse /= (DIM * DIM);
     std::cout << "MSE between floating-point and E4M3 matrix multiplication: " << mse << std::endl;
 
+    // Save E4M3 output to file ===
+    convertFloatMatrixToMyFP_8(matrixC_E4M3_float, matrixC_E4M3_file, 4, 3);
 
+
+
+    // test on multiplication between matrix_a_E5M2 and matrix_b_E5M2
+    data_8 matrixA_E5M2[DIM][DIM], matrixB_E5M2[DIM][DIM];
+    float matrixC_E5M2_float[DIM][DIM] = {0};
+
+    // Read matrices
+    readMatrix(matrixA_E5M2_file, matrixA_E5M2);
+    readMatrix(matrixB_E5M2_file, matrixB_E5M2);
+
+    // Perform floating-point matrix multiplication
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j)
+            for (int k = 0; k < DIM; ++k) {
+                matrixC_E5M2_float[i][j] = 0;
+            }
+
+    // Perform E5M2 matrix multiplication
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j)
+            for (int k = 0; k < DIM; ++k) {
+                float valueA = myFP2float_8(matrixA_E5M2[i][k], 5, 2);
+                float valueB = myFP2float_8(matrixB_E5M2[k][j], 5, 2);
+                matrixC_E5M2_float[i][j] += valueA * valueB;
+            }
+
+    // Compute MSE
+    mse = 0;
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j) {
+            mse += std::pow(matrixC_float[i][j] - matrixC_E5M2_float[i][j], 2);
+            printf("float: %.8f, myFP: %.8f\n", matrixC_float[i][j], matrixC_E5M2_float[i][j]);
+        }
+
+    mse /= (DIM * DIM);
+    std::cout << "MSE between floating-point and E5M2 matrix multiplication: " << mse << std::endl;
+
+    // Save E5M2 output to file
+    convertFloatMatrixToMyFP_8(matrixC_E5M2_float, matrixC_E5M2_file, 5, 2);
 
 
     // test on multiplication between matrix_a_E5M10 and matrix_b_E5M10
@@ -257,20 +356,13 @@ int main() {
     // Read matrices
     readMatrix(matrixA_E5M10_file, matrixA_E5M10);
     readMatrix(matrixB_E5M10_file, matrixB_E5M10);
-    readMatrix(matrixA_float_file, matrixA_float);
-    readMatrix(matrixB_float_file, matrixB_float);
 
     // Perform floating-point matrix multiplication
     for (int i = 0; i < DIM; ++i)
         for (int j = 0; j < DIM; ++j)
             for (int k = 0; k < DIM; ++k) {
-                matrixC_E5M10_float[i][j] = 0; matrixC_float[i][j] = 0;
+                matrixC_E5M10_float[i][j] = 0;
             }
-
-    for (int i = 0; i < DIM; ++i)
-        for (int j = 0; j < DIM; ++j)
-            for (int k = 0; k < DIM; ++k)
-                matrixC_float[i][j] += matrixA_float[i][k] * matrixB_float[k][j];
 
     // Perform E5M10 matrix multiplication
     for (int i = 0; i < DIM; ++i)
@@ -286,12 +378,91 @@ int main() {
     for (int i = 0; i < DIM; ++i)
         for (int j = 0; j < DIM; ++j) {
             mse += std::pow(matrixC_float[i][j] - matrixC_E5M10_float[i][j], 2);
-            //printf("float: %.8f, myFP: %.8f\n", matrixC_float[i][j], matrixC_E5M10_float[i][j]);
+            printf("float: %.8f, myFP: %.8f\n", matrixC_float[i][j], matrixC_E5M10_float[i][j]);
         }
 
     mse /= (DIM * DIM);
     std::cout << "MSE between floating-point and E5M10 matrix multiplication: " << mse << std::endl;
+    // Save E5M10 output to file
+    convertFloatMatrixToMyFP_16(matrixC_E5M10_float, matrixC_E5M10_file, 5, 10);
 
 
+    // test on multiplication between matrix_a_AP8_4 and matrix_b_AP8_4
+    ap_fixed<8, 4, AP_TRN, AP_SAT> matrixA_AP8_4[DIM][DIM], matrixB_AP8_4[DIM][DIM];
+    float matrixC_AP8_4_float[DIM][DIM] = {0};
+
+    // Read matrices
+    readMatrix(matrixA_AP8_4_file, matrixA_AP8_4);
+    readMatrix(matrixB_AP8_4_file, matrixB_AP8_4);
+
+    // Perform floating-point matrix multiplication
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j)
+            for (int k = 0; k < DIM; ++k) {
+                matrixC_AP8_4_float[i][j] = 0;
+            }
+
+    // Perform AP8_4 matrix multiplication
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j)
+            for (int k = 0; k < DIM; ++k) {
+                float valueA = (float)matrixA_AP8_4[i][k];
+                float valueB = (float)matrixB_AP8_4[k][j];
+                matrixC_AP8_4_float[i][j] += valueA * valueB;
+            }
+
+    // Compute MSE
+    mse = 0;
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j) {
+            mse += std::pow(matrixC_float[i][j] - matrixC_AP8_4_float[i][j], 2);
+            printf("float: %.8f, myFP: %.8f\n", matrixC_float[i][j], matrixC_AP8_4_float[i][j]);
+        }
+
+    mse /= (DIM * DIM);
+    std::cout << "MSE between floating-point and AP8_4 matrix multiplication: " << mse << std::endl;
+    // Save AP8_4 output to file
+    convertFloatMatrixToAPFix_8(matrixC_AP8_4_float, matrixC_AP8_4_file);
+
+
+    // test on multiplication between matrix_a_AP16_5 and matrix_b_AP16_5
+    ap_fixed<16, 5, AP_TRN, AP_SAT> matrixA_AP16_5[DIM][DIM], matrixB_AP16_5[DIM][DIM];
+    float matrixC_AP16_5_float[DIM][DIM] = {0};
+
+    // Read matrices
+    readMatrix(matrixA_AP16_5_file, matrixA_AP16_5);
+    readMatrix(matrixB_AP16_5_file, matrixB_AP16_5);
+
+    // Perform floating-point matrix multiplication
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j)
+            for (int k = 0; k < DIM; ++k) {
+                matrixC_AP16_5_float[i][j] = 0;
+            }
+
+    // Perform AP16_5 matrix multiplication
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j)
+            for (int k = 0; k < DIM; ++k) {
+                float valueA = (float)matrixA_AP16_5[i][k];
+                float valueB = (float)matrixB_AP16_5[k][j];
+                matrixC_AP16_5_float[i][j] += valueA * valueB;
+            }
+
+    // Compute MSE
+    mse = 0;
+    for (int i = 0; i < DIM; ++i)
+        for (int j = 0; j < DIM; ++j) {
+            mse += std::pow(matrixC_float[i][j] - matrixC_AP16_5_float[i][j], 2);
+            printf("float: %.8f, myFP: %.8f\n", matrixC_float[i][j], matrixC_AP16_5_float[i][j]);
+        }
+
+    mse /= (DIM * DIM);
+    std::cout << "MSE between floating-point and AP16_5 matrix multiplication: " << mse << std::endl;
+    // Save AP16_5 output to file
+    convertFloatMatrixToAPFix_16(matrixC_AP16_5_float, matrixC_AP16_5_file);
+    
+    
+    
     return 0;
 }
