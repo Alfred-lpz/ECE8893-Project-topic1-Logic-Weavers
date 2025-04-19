@@ -1,7 +1,7 @@
-open_project project_1
+open_project mixed_precision
 
 # set top function of the HLS design
-set_top MatMul_E4M3
+set_top MatMul_mix_fixed
 
 # add source file
 add_files hls_kernels.cpp
