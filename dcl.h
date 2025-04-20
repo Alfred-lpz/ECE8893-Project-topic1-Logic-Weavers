@@ -64,8 +64,8 @@ void MatMul_mix_fixed(
     // data_16 a[DIM][DIM],
     // data_16 b[DIM][DIM],
     wide_t b_wide[(DIM * DIM) / 32],
-    // data_16 c[DIM][DIM],
-    wide_t c_wide[(DIM * DIM) / 32],
+    data_16 c[DIM][DIM],
+    // wide_t c_wide[(DIM * DIM) / 32],
     ap_uint<3> mode
 );
 
