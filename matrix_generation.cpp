@@ -219,61 +219,81 @@ void convertFloatMatrixToAPFix_16(float matrixFloat[DIM][DIM], const char* outpu
 
 
 int main() {
-    const char* matrixA_float_file = "matrix_a_float_1.bin";
-    const char* matrixB_float_file = "matrix_b_float_1.bin";
-    const char* matrixC_float_file = "matrix_c_float_1.bin";
+    const char* matrixA_float_file = "matrix_a_float.bin";
+    const char* matrixB_float_file = "matrix_b_float.bin";
+    const char* matrixC_float_file = "matrix_c_float.bin";
 
-    const char* matrixA_E4M3_file = "matrix_a_E4M3_1.bin";
-    const char* matrixB_E4M3_file = "matrix_b_E4M3_1.bin";
-    const char* matrixC_E4M3_file = "matrix_c_E4M3_1.bin";
+    const char* matrixA_E4M3_file = "matrix_a_E4M3.bin";
+    const char* matrixB_E4M3_file = "matrix_b_E4M3.bin";
+    const char* matrixC_E4M3_file = "matrix_c_E4M3.bin";
 
-    const char* matrixA_E5M2_file = "matrix_a_E5M2_1.bin";
-    const char* matrixB_E5M2_file = "matrix_b_E5M2_1.bin";
-    const char* matrixC_E5M2_file = "matrix_c_E5M2_1.bin";
+    const char* matrixA_E5M2_file = "matrix_a_E5M2.bin";
+    const char* matrixB_E5M2_file = "matrix_b_E5M2.bin";
+    const char* matrixC_E5M2_file = "matrix_c_E5M2.bin";
 
 
-    const char* matrixA_E5M10_file = "matrix_a_E5M10_1.bin";
-    const char* matrixB_E5M10_file = "matrix_b_E5M10_1.bin";
-    const char* matrixC_E5M10_file = "matrix_c_E5M10_1.bin";
+    const char* matrixA_E5M10_file = "matrix_a_E5M10.bin";
+    const char* matrixB_E5M10_file = "matrix_b_E5M10.bin";
+    const char* matrixC_E5M10_file = "matrix_c_E5M10.bin";
 
-    const char* matrixA_AP16_5_file = "matrix_a_AP16_5_1.bin";
-    const char* matrixB_AP16_5_file = "matrix_b_AP16_5_1.bin";
-    const char* matrixC_AP16_5_file = "matrix_c_AP16_5_1.bin";
+    const char* matrixA_AP16_5_file = "matrix_a_AP16_5.bin";
+    const char* matrixB_AP16_5_file = "matrix_b_AP16_5.bin";
+    const char* matrixC_AP16_5_file = "matrix_c_AP16_5.bin";
 
-    const char* matrixA_AP8_4_file = "matrix_a_AP8_4_1.bin";
-    const char* matrixB_AP8_4_file = "matrix_b_AP8_4_1.bin";
-    const char* matrixC_AP8_4_file = "matrix_c_AP8_4_1.bin";
+    const char* matrixA_AP8_4_file = "matrix_a_AP8_4.bin";
+    const char* matrixB_AP8_4_file = "matrix_b_AP8_4.bin";
+    const char* matrixC_AP8_4_file = "matrix_c_AP8_4.bin";
 
     // Generate floating-point matrices
-    generateFloatMatrix(matrixA_float_file);
-    generateFloatMatrix(matrixB_float_file);
+    // generateFloatMatrix(matrixA_float_file);
+    // generateFloatMatrix(matrixB_float_file);
 
     // Convert floating-point matrices to custom floating-point formats
-    convertFloatToMyFP_8(matrixA_float_file, matrixA_E4M3_file, 4, 3);
-    convertFloatToMyFP_8(matrixB_float_file, matrixB_E4M3_file, 4, 3);
-    convertFloatToMyFP_8(matrixA_float_file, matrixA_E5M2_file, 5, 2);
-    convertFloatToMyFP_8(matrixB_float_file, matrixB_E5M2_file, 5, 2);
-    convertFloatToMyFP_16(matrixA_float_file, matrixA_E5M10_file, 5, 10);
-    convertFloatToMyFP_16(matrixB_float_file, matrixB_E5M10_file, 5, 10);
+    // convertFloatToMyFP_8(matrixA_float_file, matrixA_E4M3_file, 4, 3);
+    // convertFloatToMyFP_8(matrixB_float_file, matrixB_E4M3_file, 4, 3);
+    // convertFloatToMyFP_8(matrixA_float_file, matrixA_E5M2_file, 5, 2);
+    // convertFloatToMyFP_8(matrixB_float_file, matrixB_E5M2_file, 5, 2);
+    // convertFloatToMyFP_16(matrixA_float_file, matrixA_E5M10_file, 5, 10);
+    // convertFloatToMyFP_16(matrixB_float_file, matrixB_E5M10_file, 5, 10);
 
     // Convert floating-point matrices to ap_fixed formats
-    convertFloatToAPFix_16(matrixA_float_file, matrixA_AP16_5_file);
-    convertFloatToAPFix_16(matrixB_float_file, matrixB_AP16_5_file);
+    // convertFloatToAPFix_16(matrixA_float_file, matrixA_AP16_5_file);
+    // convertFloatToAPFix_16(matrixB_float_file, matrixB_AP16_5_file);
 
-    convertFloatToAPFix_8(matrixA_float_file, matrixA_AP8_4_file);
-    convertFloatToAPFix_8(matrixB_float_file, matrixB_AP8_4_file);
+    // convertFloatToAPFix_8(matrixA_float_file, matrixA_AP8_4_file);
+    // convertFloatToAPFix_8(matrixB_float_file, matrixB_AP8_4_file);
 
-    std::cout << "All computations complete. Results saved to respective files." << std::endl;
+    // std::cout << "All computations complete. Results saved to respective files." << std::endl;
 
     float matrixA_float[DIM][DIM], matrixB_float[DIM][DIM], matrixC_float[DIM][DIM] = {0};
     readMatrix(matrixA_float_file, matrixA_float);
     readMatrix(matrixB_float_file, matrixB_float);
 
     // Perform floating-point matrix multiplication
-    for (int i = 0; i < DIM; ++i)
-        for (int j = 0; j < DIM; ++j)
-            for (int k = 0; k < DIM; ++k)
-                matrixC_float[i][j] += matrixA_float[i][k] * matrixB_float[k][j];
+    // for (int i = 0; i < DIM; ++i)
+    //     for (int j = 0; j < DIM; ++j)
+    //         for (int k = 0; k < DIM; ++k)
+    //             matrixC_float[i][j] += matrixA_float[i][k] * matrixB_float[k][j];
+    for (int i = 0; i < DIM; ++i) {
+        for (int j = 0; j < DIM; ++j) {
+            matrixC_float[i][j] = 0; 
+            for (int k = 0; k < DIM; ++k) {
+                float a_val = matrixA_float[i][k];
+                float b_val = matrixB_float[k][j];
+                float product = a_val * b_val;
+                if(i==0 && j==0){
+                    printf("A[%d][%d] = %.8f * B[%d][%d] = %.8f --> %.8f\n",
+                    i, k, a_val, k, j, b_val, product);
+                }
+                matrixC_float[i][j] += product;
+                if(i==0 && j==0){
+                    printf("Accumulated C[%d][%d] = %.8f\n", i, j, matrixC_float[i][j]);
+                }
+
+            }
+        }
+    }
+
     writeMatrix(matrixC_float_file, matrixC_float);
 
 
