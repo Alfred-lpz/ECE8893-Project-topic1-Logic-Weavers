@@ -1,4 +1,4 @@
-open_project project_3
+open_project project_5
 
 # set top function of the HLS design
 # set_top MatMul_E4M3
@@ -39,15 +39,15 @@ set_part {xczu3eg-sbva484-1-e}
 # default frequency is 100 MHz
 #create_clock -period 4 -name default
 
-csim_design
+#csim_design
 # C synthesis for HLS design, generating RTL
-csynth_design
+#csynth_design
 
 # C/RTL co-simulation; can be commented if not needed
 cosim_design
 
 # export generated RTL as an IP; can be commented if not needed
-export_design -format ip_catalog -flow impl
+#export_design -format ip_catalog -flow impl
 
 
 

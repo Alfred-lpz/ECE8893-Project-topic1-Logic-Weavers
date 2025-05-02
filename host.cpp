@@ -1,7 +1,98 @@
 /* This is the host code for the HLS kernel, used to control, provide inputs, and collect results from HLS kernel */
 /* Also known as the testbench, used to check the functionality of HLS kernel */
 
+
 #include "dcl.h"
+
+
+void float2myFP_8(float *f, data_8 *h, int EB, int MB, bool *overflow)
+{
+    ap_uint<std_FP32_TOTAL_BIT>* ptr = (ap_uint<std_FP32_TOTAL_BIT>*)f;
+    uint8_t myFP_total_bit = EB + MB + 1;
+
+    (*h)[myFP_total_bit-1] = (*ptr)[std_FP32_TOTAL_BIT-1]; // sign bit
+    ap_uint<std_FP32_EXPN_BIT + 2> e1 = (*ptr).range(std_FP32_TOTAL_BIT-2, std_FP32_MANT_BIT); // expn bits
+
+    uint8_t bias_myFP = ((uint8_t)1 << (EB-1)) - 1; // my type bias
+    ap_uint<std_FP32_EXPN_BIT + 2> e2 = 0;
+    e2 = e1 - std_FP32_BIAS + bias_myFP;
+    if( e2[EB+1] == 0 && e2[EB] == 1 ) {    // overflow: new expn is larger than max
+        e2 = ~0;
+        *overflow = true;
+    }
+    else if ( e2[EB+1] == 1 ) { // underflow: new expn is smaller than 0
+        e2 = 0;
+        *overflow = true;
+    }
+    (*h).range(myFP_total_bit-2, myFP_total_bit-1-EB) = e2.range(EB-1, 0); // expn bits
+    (*h).range(MB-1, 0) = (*ptr).range(std_FP32_MANT_BIT-1, std_FP32_MANT_BIT-MB); // mant bits
+}
+
+
+
+void float2myFP_16(float *f, data_16 *h, int EB, int MB, bool *overflow)
+{
+    ap_uint<std_FP32_TOTAL_BIT>* ptr = (ap_uint<std_FP32_TOTAL_BIT>*)f;
+    uint8_t myFP_total_bit = EB + MB + 1;
+
+    (*h)[myFP_total_bit-1] = (*ptr)[std_FP32_TOTAL_BIT-1]; // sign bit
+    ap_uint<std_FP32_EXPN_BIT + 2> e1 = (*ptr).range(std_FP32_TOTAL_BIT-2, std_FP32_MANT_BIT); // expn bits
+
+    uint8_t bias_myFP = ((uint8_t)1 << (EB-1)) - 1; // my type bias
+    ap_uint<std_FP32_EXPN_BIT + 2> e2 = 0;
+    e2 = e1 - std_FP32_BIAS + bias_myFP;
+    if( e2[EB+1] == 0 && e2[EB] == 1 ) {    // overflow: new expn is larger than max
+        e2 = ~0;
+        *overflow = true;
+    }
+    else if ( e2[EB+1] == 1 ) { // underflow: new expn is smaller than 0
+        e2 = 0;
+        *overflow = true;
+    }
+    (*h).range(myFP_total_bit-2, myFP_total_bit-1-EB) = e2.range(EB-1, 0); // expn bits
+    (*h).range(MB-1, 0) = (*ptr).range(std_FP32_MANT_BIT-1, std_FP32_MANT_BIT-MB); // mant bits
+}
+
+
+float myFP2float_8(const data_8 h, int EB, int MB)
+{
+    ap_uint<std_FP32_TOTAL_BIT> f = 0;
+    
+    uint8_t myFP_total_bit = EB + MB + 1;
+    f[std_FP32_TOTAL_BIT-1] = h[myFP_total_bit - 1]; // sign bit
+
+    uint8_t bias_myFP = ((uint8_t)1 << (EB-1)) - 1; // my type bias
+    ap_uint<std_FP32_EXPN_BIT + 2> e1 = 0;
+    e1.range(EB-1, 0) = h.range(myFP_total_bit-2, myFP_total_bit-1-EB);
+    ap_uint<std_FP32_EXPN_BIT + 2> e2 = e1 - bias_myFP + std_FP32_BIAS;
+
+    f.range(std_FP32_TOTAL_BIT-2, std_FP32_MANT_BIT) = e2.range(std_FP32_EXPN_BIT-1, 0);
+    f.range(std_FP32_MANT_BIT-1, std_FP32_MANT_BIT-MB) = h.range(MB-1, 0);
+    // remaining bits are pre-filled with zeros
+    return *(float*)(&f);
+}
+
+
+
+float myFP2float_16(const data_16 h, int EB, int MB)
+{
+    ap_uint<std_FP32_TOTAL_BIT> f = 0;
+    
+    uint8_t myFP_total_bit = EB + MB + 1;
+    f[std_FP32_TOTAL_BIT-1] = h[myFP_total_bit - 1]; // sign bit
+
+    uint8_t bias_myFP = ((uint8_t)1 << (EB-1)) - 1; // my type bias
+    ap_uint<std_FP32_EXPN_BIT + 2> e1 = 0;
+    e1.range(EB-1, 0) = h.range(myFP_total_bit-2, myFP_total_bit-1-EB);
+    ap_uint<std_FP32_EXPN_BIT + 2> e2 = e1 - bias_myFP + std_FP32_BIAS;
+
+    f.range(std_FP32_TOTAL_BIT-2, std_FP32_MANT_BIT) = e2.range(std_FP32_EXPN_BIT-1, 0);
+    f.range(std_FP32_MANT_BIT-1, std_FP32_MANT_BIT-MB) = h.range(MB-1, 0);
+    // remaining bits are pre-filled with zeros
+    return *(float*)(&f);
+}
+
+
 int main()
 {	
 	// Top‐level wrapper: MatMul_mix_fixed(A,B,C,mode)
@@ -13,7 +104,7 @@ int main()
 	static data_16 A[DIM][DIM], B[DIM][DIM], C_HLS[DIM][DIM], C_ref[DIM][DIM];
 	static float  C_HLS_f[DIM][DIM], C_ref_f[DIM][DIM];
 
-	for (int mode = 0; mode < 1; ++mode) {
+	for (int mode = 0; mode < 5; ++mode) {
 		const char* suf = suffixes[mode];
 		std::cout << "Testing mode " << mode << " (" << suf << ")...\n";
 

@@ -36,6 +36,8 @@ typedef ap_uint<myFP_MAX_SIGN_BIT> myFP_sign;
 typedef ap_uint<myFP_MAX_EXPN_BIT + 2> myFP_expn; // account for exp overflow
 typedef ap_uint<myFP_MAX_MANT_BIT + 1> myFP_mant; // account for the implicit 1 before mantissa
 
+typedef ap_uint<8> myUint; // account for the implicit 1 before mantissa
+
 
 float randomFloatRange(float min1, float max1, float min2, float max2);
 void float2myFP_8(float *f, data_8 *h, int EB, int MB, bool *overflow);
